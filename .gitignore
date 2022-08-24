@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.devcontainer/devcontainer.json
+.gitignore
+little_blockchain/poetry.lock
+little_blockchain/README.rst
