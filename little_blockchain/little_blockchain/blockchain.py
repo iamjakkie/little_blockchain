@@ -1,7 +1,11 @@
 import json
+import random
+import sys 
 
 from datetime import datetime
 from hashlib import sha256
+
+sys.setrecursionlimit(50000)
 
 class Blockchain(object):
     def __init__(self) -> None:
@@ -11,12 +15,13 @@ class Blockchain(object):
         print("genesis block")
         self.new_block()
 
-    def new_block(self, previous_hash=None):
+    def new_block(self):
         block = {
             'index': len(self.chain),
             'timestamp': datetime.utcnow().isoformat(),
             'transactions': self.pending_transactions,
-            'previous_hash': previous_hash,
+            'previous_hash': self.last_block(),
+            'nonce': format(random.getrandbits(64), 'x'),
         }
 
         block_hash = self.hash(block)
@@ -25,7 +30,7 @@ class Blockchain(object):
         self.pending_transactions = []
         self.chain.append(block)
 
-        print(f"created block {block['index']}")
+        # print(f"created block {block['index']}")
         return block
 
     @staticmethod
@@ -44,7 +49,14 @@ class Blockchain(object):
         })
 
     def proof_of_work(self):
-        pass
+        while True:
+            new_block = self.new_block()
+            if self.valid_block(new_block):
+                break
+        
+        self.chain.append(new_block)
+        print('found a new block: ', new_block)
 
-    def valid_hash(self):
-        pass
+    @staticmethod
+    def valid_block(block):
+        return block['hash'].startswith('0000')
